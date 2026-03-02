@@ -1,6 +1,8 @@
 package com.realtime.price.tracker.feature.data
 
+import com.google.gson.Gson
 import com.realtime.price.tracker.feature.data.dto.StockDetailModel
+import com.realtime.price.tracker.feature.data.dto.StockDetailResponseModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,12 +15,12 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.retryWhen
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
-import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 import kotlin.math.min
 import kotlin.math.pow
@@ -35,6 +37,7 @@ sealed class StockDetailsResult {
 
 class StockPriceDetailsWebSocketDataSource(
     private val tokenProvider: () -> String,
+    private val mockDataGenerator: MockDataGenerator,
     private val retryConfig: RetryConfig = RetryConfig()
 ) {
     data class RetryConfig(
@@ -60,6 +63,8 @@ class StockPriceDetailsWebSocketDataSource(
         .pingInterval(30, TimeUnit.SECONDS)
         .build()
 
+    private val gson = Gson()
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private var webSocket: WebSocket? = null
@@ -70,8 +75,19 @@ class StockPriceDetailsWebSocketDataSource(
         extraBufferCapacity = 10
     )
 
+    fun startMockUpdates() {
+            scope.launch {
+                mockDataGenerator.generateMockStockPrices()
+                    .collect {
+                        webSocket?.send(it)
+                    }
+            }
+    }
+
     fun observeStockPriceDetails(): Flow<StockDetailsResult> = flow<StockDetailsResult> {
         ensureConnected()
+
+        startMockUpdates()
 
         _stockUpdates.collect { stocks ->
             emit(StockDetailsResult.Success(stocks))
@@ -121,17 +137,15 @@ class StockPriceDetailsWebSocketDataSource(
 
             override fun onMessage(webSocket: WebSocket, text: String) {
                 try {
-                    val json = JSONObject(text)
-                    val status = json.optString("status", STATUS_SUCCESS)
+                    val response = gson.fromJson(text, StockDetailResponseModel::class.java)
 
-                    if (status == STATUS_ERROR) {
-                        handleError(json)
+                    if (response.status == STATUS_ERROR) {
+                        handleError(response)
                         return
                     }
 
                     // Parse the stock list from the message
-                    val stocks = parseStockList(json)
-                    _stockUpdates.tryEmit(stocks)
+                    _stockUpdates.tryEmit(response.stocks)
 
                 } catch (_: Exception) {
                     // Log error, don't crash the connection
@@ -154,30 +168,10 @@ class StockPriceDetailsWebSocketDataSource(
         })
     }
 
-    private fun handleError(json: JSONObject) {
-        val errorCode = json.optString("code", "UNKNOWN_ERROR")
-
-        when (errorCode) {
-            "AUTH_EXPIRED" -> {
-                webSocket?.close(CLOSE_AUTH_EXPIRED, "Token expired")
-            }
-            // Other errors are handled via Flow error handling
-        }
-    }
-
-    private fun parseStockList(json: JSONObject): List<StockDetailModel> {
-        val stocksArray = json.optJSONArray("stocks") ?: return emptyList()
-
-        return (0 until stocksArray.length()).map { index ->
-            val stockJson = stocksArray.getJSONObject(index)
-            StockDetailModel(
-                symbol = stockJson.getString("symbol"),
-                name = stockJson.optString("name", ""),
-                price = stockJson.optDouble("price", 0.0),
-                currency = stockJson.optString("currency", "USD"),
-                description = stockJson.optString("description", "")
-            )
-        }
+    private fun handleError(response: StockDetailResponseModel) {
+        // For now, just close the connection on error status
+        // The error details could be added to StockDetailResponseModel if needed
+        webSocket?.close(CLOSE_AUTH_EXPIRED, "Error status received")
     }
 
     private fun isRetryableError(throwable: Throwable): Boolean {

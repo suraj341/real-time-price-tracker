@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.realtime.price.tracker.feature.data.MockDataGenerator
 import com.realtime.price.tracker.feature.data.StockPriceDetailsRepository
 import com.realtime.price.tracker.feature.data.StockPriceDetailsWebSocketDataSource
 import com.realtime.price.tracker.feature.domain.StockPriceDetailsUseCase
@@ -15,7 +16,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
-        val dataSource = StockPriceDetailsWebSocketDataSource(tokenProvider = { "your_token" })
+        val mockDataGenerator = MockDataGenerator(applicationContext)
+        val dataSource = StockPriceDetailsWebSocketDataSource(tokenProvider = { "your_token" }, mockDataGenerator = mockDataGenerator)
         val repository = StockPriceDetailsRepository(dataSource)
         val useCase = StockPriceDetailsUseCase(repository)
         val viewModel = StockPriceTrackerListScreenViewModel(useCase)
