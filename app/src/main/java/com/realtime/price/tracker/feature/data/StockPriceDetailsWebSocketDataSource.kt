@@ -1,6 +1,6 @@
 package com.realtime.price.tracker.feature.data
 
-import com.realtime.price.tracker.feature.data.dto.StockDetailResponseModel
+import com.realtime.price.tracker.feature.data.dto.StockDetailModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.retryWhen
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -24,7 +25,7 @@ import kotlin.math.pow
 
 sealed class StockDetailsResult {
     data class Success(
-        val stocks: List<StockDetailResponseModel>
+        val stocks: List<StockDetailModel>
     ) : StockDetailsResult()
     data class Error(
         val exception: Throwable,
@@ -64,7 +65,7 @@ class StockPriceDetailsWebSocketDataSource(
     private var webSocket: WebSocket? = null
     private var isConnected = false
 
-    private val _stockUpdates = MutableSharedFlow<List<StockDetailResponseModel>>(
+    private val _stockUpdates = MutableSharedFlow<List<StockDetailModel>>(
         replay = 1,
         extraBufferCapacity = 10
     )
@@ -90,7 +91,7 @@ class StockPriceDetailsWebSocketDataSource(
     }.catch { cause: Throwable ->
         emit(StockDetailsResult.Error(cause))
         disconnect()
-    }
+    }.flowOn(Dispatchers.IO)
 
     fun disconnect() {
         webSocket?.close(CLOSE_NORMAL, "Client disconnecting")
@@ -164,17 +165,17 @@ class StockPriceDetailsWebSocketDataSource(
         }
     }
 
-    private fun parseStockList(json: JSONObject): List<StockDetailResponseModel> {
+    private fun parseStockList(json: JSONObject): List<StockDetailModel> {
         val stocksArray = json.optJSONArray("stocks") ?: return emptyList()
 
         return (0 until stocksArray.length()).map { index ->
             val stockJson = stocksArray.getJSONObject(index)
-            StockDetailResponseModel(
+            StockDetailModel(
                 symbol = stockJson.getString("symbol"),
                 name = stockJson.optString("name", ""),
                 price = stockJson.optDouble("price", 0.0),
                 currency = stockJson.optString("currency", "USD"),
-                details = stockJson.optString("details", "")
+                description = stockJson.optString("description", "")
             )
         }
     }
