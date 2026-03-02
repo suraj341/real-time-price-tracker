@@ -1,4 +1,11 @@
 package com.realtime.price.tracker.feature.data
 
-class StockPriceDetailsRepository {
+import kotlinx.coroutines.flow.Flow
+
+class StockPriceDetailsRepository(
+    private val webSocketDataSource: StockPriceDetailsWebSocketDataSource
+) {
+    fun observeStockPriceDetails(stockSymbol: String): Flow<StockDetailsResult> {
+        return webSocketDataSource.observeStockPriceDetails()
+    }
 }
