@@ -153,8 +153,8 @@ private fun PriceSection(
     priceChange: PriceChange
 ) {
     val indicatorText = when (priceChange) {
-        PriceChange.UP -> stringResource(R.string.price_up_indicator)
-        PriceChange.DOWN -> stringResource(R.string.price_down_indicator)
+        PriceChange.UP -> "↑"
+        PriceChange.DOWN -> "↓"
         PriceChange.NONE -> ""
     }
     val indicatorColor = when (priceChange) {
