@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +30,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.realtime.price.tracker.ui.theme.Success
+import com.realtime.price.tracker.ui.theme.Error
 
 @Composable
 fun StockPriceTrackerScreen(
@@ -42,6 +45,7 @@ fun StockPriceTrackerScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
                 .safeDrawingPadding(),
             contentAlignment = Alignment.Center
         ) {
@@ -51,6 +55,7 @@ fun StockPriceTrackerScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
                 .safeDrawingPadding()
         ) {
             stickyHeader {
@@ -77,17 +82,16 @@ fun Header(
     isConnected: Boolean,
     onToggleClick: () -> Unit
 ) {
-    val connectionColor = if (isConnected) Color(0xFF4CAF50) else Color(0xFFE53935)
+    val connectionColor = if (isConnected) Success else Error
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Left: Connection status indicator
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -100,11 +104,11 @@ fun Header(
             Text(
                 text = if (isConnected) "Connected" else "Disconnected",
                 modifier = Modifier.padding(start = 8.dp),
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
-        // Right: Toggle button
         Switch(
             checked = isConnected,
             onCheckedChange = { onToggleClick() }
@@ -126,8 +130,8 @@ fun StockItem(
         PriceChange.NONE -> ""
     }
     val indicatorColor = when (priceChange) {
-        PriceChange.UP -> Color(0xFF4CAF50)  // Green
-        PriceChange.DOWN -> Color(0xFFE53935)  // Red
+        PriceChange.UP -> Success
+        PriceChange.DOWN -> Error
         PriceChange.NONE -> Color.Transparent
     }
 
@@ -146,7 +150,7 @@ fun StockItem(
             ) {
                 Text(
                     text = stockData.symbol,
-                    color = Color.Blue,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .padding(9.dp)
@@ -161,27 +165,25 @@ fun StockItem(
                     )
                 }
             }
-            // Right side: Currency and Price with fixed widths
             Row(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Currency (left-aligned in its box)
                 Text(
                     text = stockData.currency,
                     modifier = Modifier.width(40.dp),
-                    textAlign = TextAlign.Start
+                    textAlign = TextAlign.Start,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                // Space between currency and price
                 Spacer(modifier = Modifier.width(8.dp))
-                // Price (right-aligned in its box)
                 Text(
                     text = String.format("%.2f", stockData.price),
                     modifier = Modifier.width(70.dp),
-                    textAlign = TextAlign.End
+                    textAlign = TextAlign.End,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
-        HorizontalDivider(color = Color.LightGray, thickness = 1.dp)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
     }
 }

@@ -8,6 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.realtime.price.tracker.ui.theme.RealTimePriceTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -18,28 +19,30 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val navController = rememberNavController()
+            RealTimePriceTrackerTheme {
+                val navController = rememberNavController()
 
-            NavHost(
-                navController = navController,
-                startDestination = StockListRoute
-            ) {
-                composable<StockListRoute> {
-                    StockPriceTrackerScreen(
-                        viewModel = hiltViewModel(),
-                        onStockClick = { symbol ->
-                            navController.navigate(StockDetailRoute(symbol))
-                        }
-                    )
-                }
+                NavHost(
+                    navController = navController,
+                    startDestination = StockListRoute
+                ) {
+                    composable<StockListRoute> {
+                        StockPriceTrackerScreen(
+                            viewModel = hiltViewModel(),
+                            onStockClick = { symbol ->
+                                navController.navigate(StockDetailRoute(symbol))
+                            }
+                        )
+                    }
 
-                composable<StockDetailRoute> { backStackEntry ->
-                    StockPriceDetailScreen(
-                        viewModel = hiltViewModel(),
-                        onNavigateBack = {
-                            navController.popBackStack()
-                        }
-                    )
+                    composable<StockDetailRoute> { backStackEntry ->
+                        StockPriceDetailScreen(
+                            viewModel = hiltViewModel(),
+                            onNavigateBack = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
                 }
             }
         }

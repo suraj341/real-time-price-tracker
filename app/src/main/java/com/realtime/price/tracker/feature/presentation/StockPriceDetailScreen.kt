@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.realtime.price.tracker.ui.theme.Success
+import com.realtime.price.tracker.ui.theme.Error
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,12 +78,10 @@ fun StockPriceDetailScreen(
                     .safeDrawingPadding()
                     .padding(16.dp)
             ) {
-                // Connection status indicator
                 ConnectionStatusIndicator(isConnected = state.value.isConnected)
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Stock Name
                 Text(
                     text = state.value.name,
                     style = MaterialTheme.typography.headlineMedium,
@@ -90,7 +90,6 @@ fun StockPriceDetailScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Price section with indicator
                 PriceSection(
                     price = state.value.price,
                     currency = state.value.currency,
@@ -99,11 +98,10 @@ fun StockPriceDetailScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                HorizontalDivider(color = Color.LightGray, thickness = 1.dp)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Description section
                 Text(
                     text = "About",
                     style = MaterialTheme.typography.titleLarge,
@@ -124,7 +122,7 @@ fun StockPriceDetailScreen(
 
 @Composable
 private fun ConnectionStatusIndicator(isConnected: Boolean) {
-    val connectionColor = if (isConnected) Color(0xFF4CAF50) else Color(0xFFE53935)
+    val connectionColor = if (isConnected) Success else Error
 
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -156,8 +154,8 @@ private fun PriceSection(
         PriceChange.NONE -> ""
     }
     val indicatorColor = when (priceChange) {
-        PriceChange.UP -> Color(0xFF4CAF50)
-        PriceChange.DOWN -> Color(0xFFE53935)
+        PriceChange.UP -> Success
+        PriceChange.DOWN -> Error
         PriceChange.NONE -> Color.Transparent
     }
 
@@ -165,7 +163,7 @@ private fun PriceSection(
         Text(
             text = "Current Price",
             style = MaterialTheme.typography.titleMedium,
-            color = Color.Gray
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -193,7 +191,7 @@ private fun PriceSection(
         Text(
             text = "Currency: $currency",
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
