@@ -4,7 +4,7 @@ import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.realtime.price.tracker.feature.data.dto.StockDetailModel
-import com.realtime.price.tracker.feature.data.dto.StockDetailResponseModel
+import com.realtime.price.tracker.feature.data.dto.StockDetailApiResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +27,7 @@ class MockDataGenerator(private val context: Context) {
 
         while (true) {
             // Create response model with success status
-            val responseModel = StockDetailResponseModel(
+            val responseModel = StockDetailApiResponse(
                 status = "success",
                 stocks = stockList!!.toList()
             )

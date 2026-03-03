@@ -2,7 +2,7 @@ package com.realtime.price.tracker.feature.data
 
 import com.google.gson.Gson
 import com.realtime.price.tracker.feature.data.dto.StockDetailModel
-import com.realtime.price.tracker.feature.data.dto.StockDetailResponseModel
+import com.realtime.price.tracker.feature.data.dto.StockDetailApiResponse
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -141,7 +141,7 @@ class StockPriceDetailsWebSocketDataSource(
 
             override fun onMessage(webSocket: WebSocket, text: String) {
                 try {
-                    val response = gson.fromJson(text, StockDetailResponseModel::class.java)
+                    val response = gson.fromJson(text, StockDetailApiResponse::class.java)
 
                     if (response.status == STATUS_ERROR) {
                         handleError(response)
@@ -172,9 +172,7 @@ class StockPriceDetailsWebSocketDataSource(
         })
     }
 
-    private fun handleError(response: StockDetailResponseModel) {
-        // For now, just close the connection on error status
-        // The error details could be added to StockDetailResponseModel if needed
+    private fun handleError(response: StockDetailApiResponse) {
         webSocket?.close(CLOSE_AUTH_EXPIRED, "Error status received")
     }
 

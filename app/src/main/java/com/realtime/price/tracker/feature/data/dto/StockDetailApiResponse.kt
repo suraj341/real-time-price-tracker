@@ -1,6 +1,6 @@
 package com.realtime.price.tracker.feature.data.dto
 
-data class StockDetailResponseModel(
+data class StockDetailApiResponse(
     val status: String,
     val stocks: List<StockDetailModel>
 )
