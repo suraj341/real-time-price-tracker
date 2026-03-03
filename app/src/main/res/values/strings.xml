@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RealTimePriceTracker</string>
+    <string name="app_name">PriceTrack</string>
     <string name="navigate_back_content_description">Navigate back</string>
     <string name="connection_status_connected">Connected</string>
     <string name="connection_status_disconnected">Disconnected</string>
