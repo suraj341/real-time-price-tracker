@@ -1,4 +1,4 @@
-package com.realtime.price.tracker.di
+package com.realtime.price.tracker.feature.di
 
 import android.content.Context
 import com.realtime.price.tracker.feature.data.MockDataGenerator
@@ -50,4 +50,3 @@ object StockPriceDetailsRepositoryModule {
         return StockPriceDetailsUseCase(repository)
     }
 }
-
