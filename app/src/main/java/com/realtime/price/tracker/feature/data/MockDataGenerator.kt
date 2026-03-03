@@ -12,33 +12,29 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlin.random.Random
 
+private const val UPDATE_INTERVAL_MS = 2000L
+private const val PRICE_CHANGE_PERCENTAGE = 0.02 // 2% max change
+
 class MockDataGenerator(private val context: Context) {
 
     private var stockList: MutableList<StockDetailModel>? = null
     private val gson = Gson()
-    private val UPDATE_INTERVAL_MS = 2000L
-    private val PRICE_CHANGE_PERCENTAGE = 0.02 // 2% max change
 
     fun generateMockStockPrices(): Flow<String> = flow {
-        // Initialize the list once from JSON
         if (stockList == null) {
             stockList = loadStockDataFromJson(context).toMutableList()
         }
 
         while (true) {
-            // Create response model with success status
             val responseModel = StockDetailApiResponse(
                 status = "success",
                 stocks = stockList!!.toList()
             )
 
-            // Convert to JSON string and emit
             emit(gson.toJson(responseModel))
 
-            // Wait 2 seconds before next update
             delay(UPDATE_INTERVAL_MS)
 
-            // Modify prices in place to reuse the list
             updatePricesRandomly()
         }
     }.flowOn(Dispatchers.IO)
