@@ -8,17 +8,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,12 +51,9 @@ fun StockPriceTrackerScreen(
                 .safeDrawingPadding()
         ) {
             stickyHeader {
-                Text(
-                    text = "Feed Screen",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White)
-                        .padding(16.dp)
+                Header(
+                    isConnected = state.value.isConnected,
+                    onToggleClick = { viewModel.toggleConnection() }
                 )
             }
             items(
@@ -66,10 +67,50 @@ fun StockPriceTrackerScreen(
 }
 
 @Composable
+fun Header(
+    isConnected: Boolean,
+    onToggleClick: () -> Unit
+) {
+    val connectionColor = if (isConnected) Color(0xFF4CAF50) else Color(0xFFE53935)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Left: Connection status indicator
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .clip(CircleShape)
+                    .background(connectionColor)
+            )
+            Text(
+                text = if (isConnected) "Connected" else "Disconnected",
+                modifier = Modifier.padding(start = 8.dp),
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        // Right: Toggle button
+        Switch(
+            checked = isConnected,
+            onCheckedChange = { onToggleClick() }
+        )
+    }
+}
+
+@Composable
 fun StockItem(stockItem: StockItemUiModel) {
     val stockData = stockItem.stock
     val priceChange = stockItem.priceChange
-    
+
     val indicatorText = when (priceChange) {
         PriceChange.UP -> "↑"
         PriceChange.DOWN -> "↓"
@@ -80,7 +121,7 @@ fun StockItem(stockItem: StockItemUiModel) {
         PriceChange.DOWN -> Color(0xFFE53935)  // Red
         PriceChange.NONE -> Color.Transparent
     }
-    
+
     Column {
         Row(
             modifier = Modifier

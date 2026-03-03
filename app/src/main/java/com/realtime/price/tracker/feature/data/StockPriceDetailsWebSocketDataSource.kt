@@ -7,10 +7,12 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -68,7 +70,9 @@ class StockPriceDetailsWebSocketDataSource(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private var webSocket: WebSocket? = null
-    private var isConnected = false
+    
+    private val _isConnected = MutableStateFlow(false)
+    val isConnected: StateFlow<Boolean> = _isConnected.asStateFlow()
 
     private val _stockUpdates = MutableSharedFlow<List<StockDetailModel>>(
         replay = 1,
@@ -112,12 +116,11 @@ class StockPriceDetailsWebSocketDataSource(
     fun disconnect() {
         webSocket?.close(CLOSE_NORMAL, "Client disconnecting")
         webSocket = null
-        isConnected = false
-        scope.cancel()
+        _isConnected.value = false
     }
 
     private fun ensureConnected() {
-        if (webSocket == null || !isConnected) {
+        if (webSocket == null || !_isConnected.value) {
             connect()
         }
     }
@@ -132,7 +135,7 @@ class StockPriceDetailsWebSocketDataSource(
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
 
             override fun onOpen(webSocket: WebSocket, response: Response) {
-                isConnected = true
+                _isConnected.value = true
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
@@ -153,16 +156,16 @@ class StockPriceDetailsWebSocketDataSource(
             }
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                isConnected = false
+                _isConnected.value = false
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                isConnected = false
+                _isConnected.value = false
                 this@StockPriceDetailsWebSocketDataSource.webSocket = null
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                isConnected = false
+                _isConnected.value = false
                 this@StockPriceDetailsWebSocketDataSource.webSocket = null
             }
         })
