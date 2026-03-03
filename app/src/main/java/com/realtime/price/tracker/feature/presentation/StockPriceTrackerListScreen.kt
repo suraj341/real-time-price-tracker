@@ -1,5 +1,6 @@
 package com.realtime.price.tracker.feature.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,12 +27,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.realtime.price.tracker.feature.data.dto.StockDetailModel
 
 @Composable
 fun StockPriceTrackerScreen(
     modifier: Modifier = Modifier,
-    viewModel: StockPriceTrackerListScreenViewModel
+    viewModel: StockPriceTrackerListScreenViewModel,
+    onStockClick: (String) -> Unit = {}
 ) {
     val state = viewModel.state.collectAsState()
 
@@ -60,7 +61,10 @@ fun StockPriceTrackerScreen(
                 items = state.value.stocks,
                 key = { it.stock.symbol }
             ) { stockItem ->
-                StockItem(stockItem)
+                StockItem(
+                    stockItem = stockItem,
+                    onClick = { onStockClick(stockItem.stock.symbol) }
+                )
             }
         }
     }
@@ -107,7 +111,10 @@ fun Header(
 }
 
 @Composable
-fun StockItem(stockItem: StockItemUiModel) {
+fun StockItem(
+    stockItem: StockItemUiModel,
+    onClick: () -> Unit
+) {
     val stockData = stockItem.stock
     val priceChange = stockItem.priceChange
 
@@ -122,7 +129,9 @@ fun StockItem(stockItem: StockItemUiModel) {
         PriceChange.NONE -> Color.Transparent
     }
 
-    Column {
+    Column(
+        modifier = Modifier.clickable { onClick() }
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -150,7 +159,7 @@ fun StockItem(stockItem: StockItemUiModel) {
                     )
                 }
             }
-            Text(text = String.format("$%.2f", stockData.price))
+            Text(text = String.format("%s %.2f", stockData.currency, stockData.price))
         }
         HorizontalDivider(color = Color.LightGray, thickness = 1.dp)
     }
