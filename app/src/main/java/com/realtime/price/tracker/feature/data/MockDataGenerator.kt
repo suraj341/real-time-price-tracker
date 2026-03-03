@@ -15,12 +15,16 @@ import kotlin.random.Random
 private const val UPDATE_INTERVAL_MS = 2000L
 private const val PRICE_CHANGE_PERCENTAGE = 0.02 // 2% max change
 
-class MockDataGenerator(private val context: Context) {
+interface MockDataGeneratorDataSource {
+    fun generateMockStockPrices(): Flow<String>
+}
+
+class MockDataGenerator(private val context: Context) : MockDataGeneratorDataSource {
 
     private var stockList: MutableList<StockDetailModel>? = null
     private val gson = Gson()
 
-    fun generateMockStockPrices(): Flow<String> = flow {
+    override fun generateMockStockPrices(): Flow<String> = flow {
         if (stockList == null) {
             stockList = loadStockDataFromJson(context).toMutableList()
         }

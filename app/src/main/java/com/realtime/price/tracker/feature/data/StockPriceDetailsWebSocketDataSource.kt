@@ -35,17 +35,23 @@ sealed class StockDetailsResult {
     ) : StockDetailsResult()
 }
 
-class StockPriceDetailsWebSocketDataSource(
-    private val mockDataGenerator: MockDataGenerator,
-    private val retryConfig: RetryConfig = RetryConfig()
-) {
-    data class RetryConfig(
-        val maxRetries: Int = 5,
-        val initialDelayMillis: Long = 1000L,
-        val maxDelayMillis: Long = 30000L,
-        val backoffMultiplier: Double = 2.0
-    )
+data class RetryConfig(
+    val maxRetries: Int = 5,
+    val initialDelayMillis: Long = 1000L,
+    val maxDelayMillis: Long = 30000L,
+    val backoffMultiplier: Double = 2.0
+)
 
+interface StockPriceDetailsDataSource {
+    val isConnected: StateFlow<Boolean>
+    fun observeStockPriceDetails(): Flow<StockDetailsResult>
+    fun disconnect()
+}
+
+class StockPriceDetailsWebSocketDataSource(
+    private val mockDataGenerator: MockDataGeneratorDataSource,
+    private val retryConfig: RetryConfig = RetryConfig()
+) : StockPriceDetailsDataSource {
     companion object {
         private const val WEBSOCKET_URL = BuildConfig.WEBSOCKET_URL
         private const val STATUS_ERROR = "error"
@@ -67,7 +73,6 @@ class StockPriceDetailsWebSocketDataSource(
     private var webSocket: WebSocket? = null
 
     private val _isConnected = MutableStateFlow(false)
-    val isConnected: StateFlow<Boolean> = _isConnected.asStateFlow()
 
     private val _stockUpdates = MutableSharedFlow<List<StockDetailModel>>(
         replay = 1,
@@ -80,16 +85,9 @@ class StockPriceDetailsWebSocketDataSource(
         startMockUpdates()
     }
 
-    fun startMockUpdates() {
-        coroutineScope.launch {
-            mockDataGenerator.generateMockStockPrices()
-                .collect {
-                    webSocket?.send(it)
-                }
-        }
-    }
+    override val isConnected: StateFlow<Boolean> = _isConnected.asStateFlow()
 
-    fun observeStockPriceDetails(): Flow<StockDetailsResult> {
+    override fun observeStockPriceDetails(): Flow<StockDetailsResult> {
         return flow<StockDetailsResult> {
             ensureConnected()
 
@@ -99,10 +97,19 @@ class StockPriceDetailsWebSocketDataSource(
         }.flowOn(Dispatchers.IO)
     }
 
-    fun disconnect() {
+    override fun disconnect() {
         webSocket?.close(CLOSE_NORMAL, "Client disconnecting")
         webSocket = null
         _isConnected.value = false
+    }
+
+    private fun startMockUpdates() {
+        coroutineScope.launch {
+            mockDataGenerator.generateMockStockPrices()
+                .collect {
+                    webSocket?.send(it)
+                }
+        }
     }
 
     private fun ensureConnected() {

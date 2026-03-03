@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 class StockPriceDetailsRepository(
-    private val webSocketDataSource: StockPriceDetailsWebSocketDataSource
+    private val webSocketDataSource: StockPriceDetailsDataSource
 ) {
     val isConnected: StateFlow<Boolean> = webSocketDataSource.isConnected
 

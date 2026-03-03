@@ -2,6 +2,8 @@ package com.realtime.price.tracker.di
 
 import android.content.Context
 import com.realtime.price.tracker.feature.data.MockDataGenerator
+import com.realtime.price.tracker.feature.data.MockDataGeneratorDataSource
+import com.realtime.price.tracker.feature.data.StockPriceDetailsDataSource
 import com.realtime.price.tracker.feature.data.StockPriceDetailsRepository
 import com.realtime.price.tracker.feature.data.StockPriceDetailsWebSocketDataSource
 import com.realtime.price.tracker.feature.domain.StockPriceDetailsUseCase
@@ -18,15 +20,15 @@ object StockPriceDetailsRepositoryModule {
 
     @Provides
     @ActivityRetainedScoped
-    fun provideMockDataGenerator(@ApplicationContext context: Context): MockDataGenerator {
+    fun provideMockDataGenerator(@ApplicationContext context: Context): MockDataGeneratorDataSource {
         return MockDataGenerator(context)
     }
 
     @Provides
     @ActivityRetainedScoped
-    fun provideWebSocketDataSource(
-        mockDataGenerator: MockDataGenerator
-    ): StockPriceDetailsWebSocketDataSource {
+    fun provideStockPriceDetailsDataSource(
+        mockDataGenerator: MockDataGeneratorDataSource
+    ): StockPriceDetailsDataSource {
         return StockPriceDetailsWebSocketDataSource(
             mockDataGenerator = mockDataGenerator
         )
@@ -35,7 +37,7 @@ object StockPriceDetailsRepositoryModule {
     @Provides
     @ActivityRetainedScoped
     fun provideRepository(
-        dataSource: StockPriceDetailsWebSocketDataSource
+        dataSource: StockPriceDetailsDataSource
     ): StockPriceDetailsRepository {
         return StockPriceDetailsRepository(dataSource)
     }
