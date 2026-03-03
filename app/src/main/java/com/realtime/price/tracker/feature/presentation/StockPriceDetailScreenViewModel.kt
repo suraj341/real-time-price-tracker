@@ -1,12 +1,16 @@
 package com.realtime.price.tracker.feature.presentation
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.realtime.price.tracker.feature.domain.StockPriceDetailsUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class StockPriceDetailUiState(
     val symbol: String = "",
@@ -19,8 +23,9 @@ data class StockPriceDetailUiState(
     val isLoading: Boolean = true
 )
 
-class StockPriceDetailScreenViewModel(
-    private val symbol: String,
+@HiltViewModel
+class StockPriceDetailScreenViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val stockPriceDetailsUseCase: StockPriceDetailsUseCase
 ) : ViewModel() {
 
@@ -39,6 +44,7 @@ class StockPriceDetailScreenViewModel(
 
         // Observe specific stock details
         viewModelScope.launch {
+            val symbol: String = savedStateHandle.toRoute<StockDetailRoute>().symbol
             stockPriceDetailsUseCase.observeStockPriceDetails(symbol)
                 .collect { stock ->
                     if (stock != null) {

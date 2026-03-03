@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.realtime.price.tracker.feature.data.StockDetailsResult
 import com.realtime.price.tracker.feature.data.dto.StockDetailModel
 import com.realtime.price.tracker.feature.domain.StockPriceDetailsUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 enum class PriceChange {
     UP, DOWN, NONE
@@ -26,7 +28,8 @@ data class StockPriceTrackerUiState(
     val isConnected: Boolean = false
 )
 
-class StockPriceTrackerListScreenViewModel(private val stockPriceDetailsUseCase: StockPriceDetailsUseCase) :
+@HiltViewModel
+class StockPriceTrackerListScreenViewModel @Inject constructor(private val stockPriceDetailsUseCase: StockPriceDetailsUseCase) :
     ViewModel() {
     private val _state = MutableStateFlow(StockPriceTrackerUiState())
     val state: StateFlow<StockPriceTrackerUiState> = _state.asStateFlow()
@@ -49,10 +52,10 @@ class StockPriceTrackerListScreenViewModel(private val stockPriceDetailsUseCase:
     private fun startCollecting() {
         // Cancel any existing job first
         collectionJob?.cancel()
-        
+
         collectionJob = viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            
+
             stockPriceDetailsUseCase.observeStockPriceDetails()
                 .collect { result ->
                     if (result is StockDetailsResult.Success) {

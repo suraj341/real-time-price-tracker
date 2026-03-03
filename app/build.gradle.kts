@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -41,6 +43,9 @@ android {
             jvmTarget = JvmTarget.JVM_11
         }
     }
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
@@ -56,6 +61,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    //hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
 
     //Compose
     implementation(libs.androidx.activity.compose)
