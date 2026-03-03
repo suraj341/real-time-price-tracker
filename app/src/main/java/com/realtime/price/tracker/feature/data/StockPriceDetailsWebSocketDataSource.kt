@@ -26,6 +26,7 @@ import okhttp3.WebSocketListener
 import java.util.concurrent.TimeUnit
 import kotlin.math.min
 import kotlin.math.pow
+import com.realtime.price.tracker.BuildConfig
 
 sealed class StockDetailsResult {
     data class Success(
@@ -50,7 +51,7 @@ class StockPriceDetailsWebSocketDataSource(
     )
 
     companion object {
-        const val WEBSOCKET_URL = "wss://ws.postman-echo.com/raw"
+        private val WEBSOCKET_URL = BuildConfig.WEBSOCKET_URL
 
         private const val STATUS_SUCCESS = "success"
         private const val STATUS_ERROR = "status"

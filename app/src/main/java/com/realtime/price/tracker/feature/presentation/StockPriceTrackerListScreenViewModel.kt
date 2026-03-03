@@ -38,19 +38,15 @@ class StockPriceTrackerListScreenViewModel @Inject constructor(private val stock
     private var collectionJob: Job? = null
 
     init {
-        // Listen to connection status updates
         viewModelScope.launch {
             stockPriceDetailsUseCase.isConnected.collect { isConnected ->
                 _state.value = _state.value.copy(isConnected = isConnected)
             }
         }
-
-        // Start initial data collection
         startCollecting()
     }
 
     private fun startCollecting() {
-        // Cancel any existing job first
         collectionJob?.cancel()
 
         collectionJob = viewModelScope.launch {
@@ -84,7 +80,6 @@ class StockPriceTrackerListScreenViewModel @Inject constructor(private val stock
 
     fun toggleConnection() {
         if (_state.value.isConnected) {
-            // Disconnect: cancel the collection job and close connection
             collectionJob?.cancel()
             collectionJob = null
             stockPriceDetailsUseCase.disconnect()
@@ -93,7 +88,6 @@ class StockPriceTrackerListScreenViewModel @Inject constructor(private val stock
                 isLoading = false
             )
         } else {
-            // Connect: restart data collection
             startCollecting()
         }
     }

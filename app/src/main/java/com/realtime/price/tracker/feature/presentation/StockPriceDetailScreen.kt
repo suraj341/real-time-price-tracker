@@ -31,11 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.realtime.price.tracker.ui.theme.Success
+import com.realtime.price.tracker.R
+import com.realtime.price.tracker.ui.theme.Dimens
 import com.realtime.price.tracker.ui.theme.Error
+import com.realtime.price.tracker.ui.theme.Success
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +54,7 @@ fun StockPriceDetailScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Navigate back"
+                            contentDescription = stringResource(R.string.navigate_back_content_description)
                         )
                     }
                 }
@@ -76,11 +77,11 @@ fun StockPriceDetailScreen(
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
                     .safeDrawingPadding()
-                    .padding(16.dp)
+                    .padding(Dimens.paddingMedium)
             ) {
                 ConnectionStatusIndicator(isConnected = state.value.isConnected)
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(Dimens.paddingLarge))
 
                 Text(
                     text = state.value.name,
@@ -88,7 +89,7 @@ fun StockPriceDetailScreen(
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Dimens.paddingMedium))
 
                 PriceSection(
                     price = state.value.price,
@@ -96,24 +97,27 @@ fun StockPriceDetailScreen(
                     priceChange = state.value.priceChange
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(Dimens.paddingLarge))
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    thickness = Dimens.dividerThickness
+                )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(Dimens.paddingLarge))
 
                 Text(
-                    text = "About",
+                    text = stringResource(R.string.about_section_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Dimens.paddingSmall))
 
                 Text(
                     text = state.value.description,
                     style = MaterialTheme.typography.bodyLarge,
-                    lineHeight = 24.sp
+                    lineHeight = Dimens.aboutSectionLineHeight
                 )
             }
         }
@@ -129,13 +133,13 @@ private fun ConnectionStatusIndicator(isConnected: Boolean) {
     ) {
         Box(
             modifier = Modifier
-                .size(12.dp)
+                .size(Dimens.connectionIndicatorSize)
                 .clip(CircleShape)
                 .background(connectionColor)
         )
         Text(
-            text = if (isConnected) "Connected" else "Disconnected",
-            modifier = Modifier.padding(start = 8.dp),
+            text = if (isConnected) stringResource(R.string.connection_status_connected) else stringResource(R.string.connection_status_disconnected),
+            modifier = Modifier.padding(start = Dimens.paddingSmall),
             fontWeight = FontWeight.Medium,
             color = connectionColor
         )
@@ -149,8 +153,8 @@ private fun PriceSection(
     priceChange: PriceChange
 ) {
     val indicatorText = when (priceChange) {
-        PriceChange.UP -> "↑"
-        PriceChange.DOWN -> "↓"
+        PriceChange.UP -> stringResource(R.string.price_up_indicator)
+        PriceChange.DOWN -> stringResource(R.string.price_down_indicator)
         PriceChange.NONE -> ""
     }
     val indicatorColor = when (priceChange) {
@@ -161,16 +165,16 @@ private fun PriceSection(
 
     Column {
         Text(
-            text = "Current Price",
+            text = stringResource(R.string.current_price_label),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(Dimens.spacingExtraSmall))
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(Dimens.paddingSmall)
         ) {
             Text(
                 text = String.format("%.2f", price),
@@ -183,13 +187,13 @@ private fun PriceSection(
                     text = indicatorText,
                     color = indicatorColor,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 32.sp
+                    fontSize = Dimens.priceIndicatorFontSize
                 )
             }
         }
 
         Text(
-            text = "Currency: $currency",
+            text = stringResource(R.string.currency_format, currency),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

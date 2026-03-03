@@ -35,14 +35,12 @@ class StockPriceDetailScreenViewModel @Inject constructor(
     private var previousPrice: Double? = null
 
     init {
-        // Listen to connection status updates
         viewModelScope.launch {
             stockPriceDetailsUseCase.isConnected.collect { isConnected ->
                 _state.value = _state.value.copy(isConnected = isConnected)
             }
         }
 
-        // Observe specific stock details
         viewModelScope.launch {
             val symbol: String = savedStateHandle.toRoute<StockDetailRoute>().symbol
             stockPriceDetailsUseCase.observeStockPriceDetails(symbol)

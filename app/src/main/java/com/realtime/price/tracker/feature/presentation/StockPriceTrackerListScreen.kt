@@ -27,9 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import com.realtime.price.tracker.R
+import com.realtime.price.tracker.ui.theme.Dimens
 import com.realtime.price.tracker.ui.theme.Success
 import com.realtime.price.tracker.ui.theme.Error
 
@@ -88,7 +90,7 @@ fun Header(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            .padding(16.dp),
+            .padding(Dimens.paddingMedium),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -97,13 +99,13 @@ fun Header(
         ) {
             Box(
                 modifier = Modifier
-                    .size(12.dp)
+                    .size(Dimens.connectionIndicatorSize)
                     .clip(CircleShape)
                     .background(connectionColor)
             )
             Text(
-                text = if (isConnected) "Connected" else "Disconnected",
-                modifier = Modifier.padding(start = 8.dp),
+                text = if (isConnected) stringResource(R.string.connection_status_connected) else stringResource(R.string.connection_status_disconnected),
+                modifier = Modifier.padding(start = Dimens.paddingSmall),
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -141,7 +143,7 @@ fun StockItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(Dimens.paddingSmall),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -153,15 +155,15 @@ fun StockItem(
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .padding(9.dp)
-                        .width(60.dp)
+                        .padding(Dimens.paddingSmall)
+                        .width(Dimens.symbolWidth)
                 )
                 if (indicatorText.isNotEmpty()) {
                     Text(
                         text = indicatorText,
                         color = indicatorColor,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 4.dp)
+                        modifier = Modifier.padding(start = Dimens.spacingExtraSmall)
                     )
                 }
             }
@@ -171,19 +173,22 @@ fun StockItem(
             ) {
                 Text(
                     text = stockData.currency,
-                    modifier = Modifier.width(40.dp),
+                    modifier = Modifier.width(Dimens.currencyWidth),
                     textAlign = TextAlign.Start,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(Dimens.paddingSmall))
                 Text(
                     text = String.format("%.2f", stockData.price),
-                    modifier = Modifier.width(70.dp),
+                    modifier = Modifier.width(Dimens.priceWidth),
                     textAlign = TextAlign.End,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.outlineVariant,
+            thickness = Dimens.dividerThickness
+        )
     }
 }

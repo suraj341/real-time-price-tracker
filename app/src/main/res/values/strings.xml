@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">RealTimePriceTracker</string>
+    <string name="navigate_back_content_description">Navigate back</string>
+    <string name="connection_status_connected">Connected</string>
+    <string name="connection_status_disconnected">Disconnected</string>
+    <string name="about_section_title">About</string>
+    <string name="current_price_label">Current Price</string>
+    <string name="currency_format">Currency: %1$s</string>
 </resources>

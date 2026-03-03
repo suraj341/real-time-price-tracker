@@ -33,6 +33,12 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            buildConfigField("String", "WEBSOCKET_URL", "\"wss://ws.postman-echo.com/raw\"")
+        }
+        release {
+            buildConfigField("String", "WEBSOCKET_URL", "\"wss://ws.postman-echo.com/raw\"")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -45,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
