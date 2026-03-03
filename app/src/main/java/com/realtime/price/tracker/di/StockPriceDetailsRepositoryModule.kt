@@ -28,7 +28,6 @@ object StockPriceDetailsRepositoryModule {
         mockDataGenerator: MockDataGenerator
     ): StockPriceDetailsWebSocketDataSource {
         return StockPriceDetailsWebSocketDataSource(
-            tokenProvider = { "your_token" },
             mockDataGenerator = mockDataGenerator
         )
     }
