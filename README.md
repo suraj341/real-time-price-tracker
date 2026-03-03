@@ -13,10 +13,9 @@ An Android application for tracking stock prices in real-time using WebSocket co
 
 | Demo   | Description            | Video |
 |--------|------------------------|-------|
-| Demo 1 | Light Theme            | [Attach your .webm file or link here] |
-| Demo 2 | Dark Theme             | [Attach your .webm file or link here] |
-| Demo 3 | Process Death Scenario | [Attach your .webm file or link here] |
-
+| Demo 1 | Light Theme            |https://github.com/user-attachments/assets/a31d4776-21a5-4442-b8c5-1960b642038f|
+| Demo 2 | Dark Theme             |https://github.com/user-attachments/assets/22bacf66-83df-4eed-a48b-982b3ac0d968|
+| Demo 3 | Process Death Scenario |https://github.com/user-attachments/assets/735e856c-34dc-4c12-93b8-0da27b999e80|
 
 ## Package Structure Rationale
 > The package structure tries to adhere to Clean Architecture principles, so that each of the layer is just aware of the layer below it.
